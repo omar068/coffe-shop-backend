@@ -7,13 +7,13 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extrae el token del header
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_ACCESS_TOKEN || 'access-secret', // Usa la misma clave que en JwtModule
+      secretOrKey: process.env.JWT_ACCESS_TOKEN || 'access-secret', 
     });
   }
 
   async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username }; // Retorna información del token
+    return { userId: payload.sub, username: payload.username }; 
   }
 }

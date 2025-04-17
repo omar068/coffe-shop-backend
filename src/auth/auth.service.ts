@@ -1,6 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './../../node_modules/@types/jsonwebtoken/index.d';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
@@ -12,17 +11,32 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) {
-    console.log("UserRepository is disponible", !!this.userRepository);
-    const verificar = 'VERIFICAR SI ESTAMOS USANDO LOS PRINCIPIOS SOLID';
-  }
+  ) {}
 
-  async register(username: string, password: string): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = this.userRepository.create({ username, password: hashedPassword });
-    return this.userRepository.save(newUser);
-  }
+  async register(username: string, password: string): Promise<Object> {
+    try {
 
+      const existingUser = await this.userRepository.findOne({ where: { username } });
+      if (existingUser) {
+        throw new BadRequestException('El usuario ya existe. Por favor, utiliza otro nombre.');
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = this.userRepository.create({ username, password: hashedPassword });
+      await this.userRepository.save(newUser);
+      return {
+        username: username,
+        message: "Usuario creado con exito"
+      }
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Hubo un problema en el servidor. Intenta nuevamente.');
+    }
+  }
+  
   async login(user: any): Promise<{ access_token: string, username: string, id: string, refreshToken: string}>{
     const payload = {username : user.username, sub : user.id};
     console.log(payload);

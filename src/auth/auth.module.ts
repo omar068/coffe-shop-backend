@@ -18,7 +18,7 @@ import { JwtStrategy } from './jwt/jwt.estrategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('PRIVATE_KEY')?.replace(/\\n/g, '\n'), // Carga la clave desde el archivo .env
+        secret: configService.get<string>('PRIVATE_KEY')?.replace(/\\n/g, '\n'), 
         signOptions: { expiresIn: '1h' },
       })
     }),

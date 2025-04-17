@@ -6,17 +6,17 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Makes the configuration available globally
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST, // Use environment variables
+      host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadEntities: process.env.AUTOLOAD_ENTITIES === 'true',
-      synchronize: process.env.TYPEORM_SYNC === 'true', // Use environment variable for sync
+      synchronize: process.env.TYPEORM_SYNC === 'true',
     }),
     AuthModule,
   ],

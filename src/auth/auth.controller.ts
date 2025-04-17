@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Req, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 
@@ -7,9 +7,17 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('auth/register')
-  async register(@Body() body: { username: string; password: string }) {
-    return this.authService.register(body.username, body.password);
+async register(@Body() body: { username: string; password: string }) {
+  try {
+    return await this.authService.register(body.username, body.password);
+  } catch (error) {
+    console.error('Error en el controlador de registro:', error);
+    if (error instanceof BadRequestException) {
+      throw error; 
+    }
+    throw new InternalServerErrorException('Error inesperado. Por favor, intenta nuevamente.');
   }
+}
 
   @Post('auth/login')
   async login(@Body() body: { username: string; password: string }) {
@@ -26,10 +34,10 @@ export class AuthController {
     const userId = req.user.userId;
     console.log('Contenido de req.user:', req.user);
     if (!userId) {
-        throw new Error('Usuario no autenticado'); // Manejo de error si falta el ID
+        throw new Error('Usuario no autenticado'); 
       }
     
-      await this.authService.logout(userId); // Llama al servicio para revocar el refresh token
+      await this.authService.logout(userId); 
       return { message: 'Logout exitoso!!' };
     }
 
