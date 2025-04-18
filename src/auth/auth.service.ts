@@ -2,7 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/entities/user.entity';
+import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -55,10 +55,6 @@ export class AuthService {
     }
   }
 
-  async logout(userId: number): Promise<void> {
-    await this.userRepository.update(userId, { refreshToken: null })
-  }
-
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userRepository.findOne({ where: { username } });
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -78,10 +74,6 @@ export class AuthService {
 
   async getUserById(userId: number): Promise<User | null> {
     return this.userRepository.findOne({ where: { id: userId } });
-  }
-
-  async getUserByUserName(userName: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { username : userName}});
   }
 
   generateAccessToken(payload: any): string {

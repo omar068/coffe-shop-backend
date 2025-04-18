@@ -28,24 +28,7 @@ async register(@Body() body: { username: string; password: string }) {
     return this.authService.login(user);
   }
 
-  @Post('auth/logout')
-  @UseGuards(AuthGuard('jwt'))
-  async logout(@Req() req: any): Promise<{ message : string}> {
-    const userId = req.user.userId;
-    console.log('Contenido de req.user:', req.user);
-    if (!userId) {
-        throw new Error('Usuario no autenticado'); 
-      }
-    
-      await this.authService.logout(userId); 
-      return { message: 'Logout exitoso!!' };
-    }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  getProfile() {
-    return { message: 'Acceso autorizado' };
-  }
 
   @Post('auth/refresh')
   async refreshToken(@Body() body : { userId: number, refreshToken: string }): Promise<{ acces_token: string }> {
